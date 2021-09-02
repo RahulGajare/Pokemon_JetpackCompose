@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pokemon">
+    package="com.rg.pokemon">
 
     <application
+        android:name="com.PokemonApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -10,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Pokemon">
         <activity
-            android:name=".MainActivity"
+            android:name="com.rg.pokemon.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Pokemon.NoActionBar">
