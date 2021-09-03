@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
             PokemonTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-
+                    Navigation()
                 }
             }
         }
@@ -38,7 +38,7 @@ fun Navigation() {
     val navController = rememberNavController();
     NavHost(navController = navController, startDestination = "Pokemon_List_Screen")
     {
-        composable("PokemonListScreen")
+        composable("Pokemon_List_Screen")
         {
             PokemonListScreen()
         }
