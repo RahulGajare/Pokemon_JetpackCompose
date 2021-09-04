@@ -1,4 +1,4 @@
-package com.rg.pokemon.`interface`
+package com.rg.pokemon
 
 import com.rg.pokemon.data.remote.response.PokemonDetail
 import com.rg.pokemon.data.remote.response.PokemonList
@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface PokiApi {
+interface PokeApi {
 
     @GET("pokemon")
     suspend fun getPokemonList(

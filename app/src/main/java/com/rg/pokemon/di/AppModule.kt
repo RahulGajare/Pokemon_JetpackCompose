@@ -1,9 +1,9 @@
 package com.rg.pokemon.di
 
-import com.rg.pokemon.`interface`.PokiApi
-import com.rg.pokemon.constants.Constants
+import com.rg.pokemon.PokeApi
+import com.rg.pokemon.PokemonRepositoryInterface
 import com.rg.pokemon.constants.Constants.BASE_URL
-import com.rg.pokemon.repository.PokemonRepository
+import com.rg.pokemon.repository.PokemonRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,19 +16,29 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+
     @Singleton
     @Provides
-    fun pokemonRepository(api: PokiApi): PokemonRepository {
-        return PokemonRepository(api)
+    fun providePokemonRepository (pokeApi : PokeApi) : PokemonRepositoryInterface
+    {
+        return PokemonRepositoryImpl(pokeApi)
     }
 
     @Singleton
     @Provides
-    fun providePokemonApi() : PokiApi{
-        return  Retrofit.Builder()
+    fun providePokeApi(): PokeApi {
+        return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL)
             .build()
-            .create(PokiApi::class.java)
+            .create(PokeApi::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideString () : String
+    {
+        return "Hey look this is a Weird String"
+    }
+
 }
