@@ -1,11 +1,11 @@
 package com.rg.pokemon.ui
 
 import android.graphics.Bitmap
-import android.util.Size
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Absolute.Center
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
@@ -125,12 +125,13 @@ fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
 @Composable
 fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
 
-//    val defaultDominantColor = MaterialTheme.colors.surface
-//    val dominantColor by remember {
-//        mutableStateOf(defaultDominantColor)
-//    }
+    val defaultDominantColor = MaterialTheme.colors.surface
+    var dominantColor by remember {
+        mutableStateOf(defaultDominantColor)
+    }
 
-    Card(elevation = 8.dp,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
@@ -138,7 +139,7 @@ fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        viewModel.dominantColorState.value,
+                        dominantColor,
                         Color.White
                     )
                 )
@@ -149,7 +150,10 @@ fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
 
     {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            PokemonImage(imageUrl = pokemon.imageUrl , viewModel)
+           PokemonImage(imageUrl = pokemon.imageUrl , viewModel){
+               dominantColor = it
+           }
+
             Text(text = pokemon.pokemonName)
         }
 
@@ -158,7 +162,7 @@ fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
 
 @ExperimentalCoilApi
 @Composable
-fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel) {
+fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel, changeDominantColor: (color : Color)->Unit) {
 
     Image(
         painter = rememberImagePainter(data = imageUrl,
@@ -177,7 +181,7 @@ fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel) {
                             size: coil.size.Size
                         ): Bitmap {
                             viewModel.calcDominantColor(input){
-                                color ->  viewModel.dominantColorState.value = color
+                                color ->  changeDominantColor(color)
                             }
                             return input
                         }
