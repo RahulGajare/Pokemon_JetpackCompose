@@ -1,12 +1,15 @@
 package com.rg.pokemon.ui
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Absolute.Center
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +39,7 @@ import com.rg.pokemon.R
 import com.rg.pokemon.models.PokemonEntry
 import com.rg.pokemon.viewmodels.PokemonListViewModel
 
+@ExperimentalFoundationApi
 @Composable
 fun PokemonListScreen() {
 
@@ -108,15 +112,21 @@ fun SearchBar(
 }
 
 
+@ExperimentalFoundationApi
 @Composable
 fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
 {
-    LazyColumn(contentPadding = PaddingValues(10.dp))
+    LazyVerticalGrid(contentPadding = PaddingValues(10.dp),cells = GridCells.Fixed(2))
     {
 
-       items(list)
-       {
-           item -> PokemonCard(pokemon = item , viewModel )
+       items(list.count())
+       {item ->
+            if(item >= list.size-1)
+                {
+                  viewModel.getPokemonList()
+            }
+            PokemonCard(pokemon = list[item], viewModel )
+
        }
     }
 }
@@ -200,5 +210,5 @@ fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel, changeDomina
 @Preview
 @Composable
 fun PokemonListScreenPreview() {
-    PokemonListScreen()
+
 }

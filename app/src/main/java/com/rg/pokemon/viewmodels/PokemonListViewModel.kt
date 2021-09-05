@@ -37,7 +37,7 @@ class PokemonListViewModel @Inject constructor(
 
 
 
-    private fun getPokemonList() {
+     fun getPokemonList() {
         viewModelScope.launch {
             isLoading.value = true
             var result = pokemonRepo.getPokemonList(PAGE_SIZE, currentPage * PAGE_SIZE)
