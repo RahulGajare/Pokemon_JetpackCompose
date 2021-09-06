@@ -25,7 +25,7 @@ class PokemonListViewModel @Inject constructor(
     private var currentPage = 0;
     val pokemonListState = mutableStateOf<List<PokemonEntry>>(emptyList())
     var loadError = mutableStateOf("")
-    private var isLoading = mutableStateOf(false)
+    var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
     val dominantColorState: MutableState<Color> = mutableStateOf(Color.White)
@@ -64,7 +64,7 @@ class PokemonListViewModel @Inject constructor(
 
                 }
                 is Resoure.Error -> {
-
+                        loadError.value = result.message.toString()
                 }
                 else -> {
 
