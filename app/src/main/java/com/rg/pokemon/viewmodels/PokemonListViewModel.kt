@@ -12,6 +12,7 @@ import com.rg.pokemon.constants.Constants.PAGE_SIZE
 import com.rg.pokemon.models.PokemonEntry
 import com.rg.pokemon.resource.Resoure
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,15 +25,17 @@ class PokemonListViewModel @Inject constructor(
 
     private var currentPage = 0;
     val pokemonListState = mutableStateOf<List<PokemonEntry>>(emptyList())
+    var pokemonCachedList = listOf<PokemonEntry>()
+    var isInSearchMode = false
     var loadError = mutableStateOf("")
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
+    private var isSearchStarting = true
 
     val dominantColorState: MutableState<Color> = mutableStateOf(Color.White)
     init {
         getPokemonList()
 
-        println("VIEWMODEL : ${testString}")
     }
 
 
@@ -82,5 +85,33 @@ class PokemonListViewModel @Inject constructor(
                 onFinish(Color(colorValue))
             }
         }
+    }
+
+    fun searchPokemon(query : String)
+    {
+        val listToSearch = if(isSearchStarting) {
+            pokemonListState.value
+        } else {
+            pokemonCachedList
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            if(query.isEmpty()) {
+                pokemonListState.value = pokemonCachedList
+                isInSearchMode = false
+                isSearchStarting = true
+                return@launch
+            }
+            val results = listToSearch.filter {
+                it.pokemonName.contains(query.trim(), ignoreCase = true) ||
+                        it.number.toString() == query.trim()
+            }
+            if(isSearchStarting) {
+                pokemonCachedList = pokemonListState.value
+                isSearchStarting = false
+            }
+            pokemonListState.value = results
+            isInSearchMode = true
+        }
+
     }
 }

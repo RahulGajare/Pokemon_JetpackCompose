@@ -19,12 +19,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
@@ -45,10 +47,15 @@ fun PokemonListScreen() {
 
     val viewModel: PokemonListViewModel = hiltViewModel()
     val pokemonEntries = viewModel.pokemonListState
+    val isLoading by remember {
+        viewModel.isLoading
+    }
+
 
     var searchText by remember {
         mutableStateOf("")
     }
+
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
@@ -67,9 +74,16 @@ fun PokemonListScreen() {
                     .padding(16.dp)
             ) {
                 searchText = it
+                viewModel.searchPokemon(it)
             }
 
+
+
+
             PokemonList(pokemonEntries.value, viewModel)
+
+          
+            
         }
     }
 
@@ -116,19 +130,36 @@ fun SearchBar(
 @Composable
 fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
 {
+    val loadError by remember {
+        viewModel.loadError
+    }
+
+    if(loadError.isNotEmpty()){
+        RetrySection(onRetryCliked = {
+            viewModel.getPokemonList()
+            viewModel.loadError.value = "" },
+            textError = loadError )
+    }
     LazyVerticalGrid(contentPadding = PaddingValues(10.dp),cells = GridCells.Fixed(2))
     {
 
        items(list.count())
        {item ->
-            if(item >= list.size-1)
-                {
-                  viewModel.getPokemonList()
-            }
+           if(!viewModel.isInSearchMode){
+               if(item >= list.size-1)
+               {
+                   viewModel.getPokemonList()
+               }
+           }
+
             PokemonCard(pokemon = list[item], viewModel )
 
        }
     }
+
+
+
+
 }
 
 @ExperimentalCoilApi
@@ -156,13 +187,14 @@ fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
             )
             .clickable {
 //                navController.navigate(route = "Pokemon_DetailScreen/${viewModel.dominantColorState.value}/${pokemon.pokemonName}")
-                })
+            })
 
     {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
            PokemonImage(imageUrl = pokemon.imageUrl , viewModel){
                dominantColor = it
            }
+
 
             Text(text = pokemon.pokemonName)
         }
@@ -176,6 +208,7 @@ fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel, changeDomina
 
     Image(
         painter = rememberImagePainter(data = imageUrl,
+
 
             builder = {
                 crossfade(true)
@@ -201,9 +234,23 @@ fun PokemonImage(imageUrl: String, viewModel: PokemonListViewModel, changeDomina
             }),
 
         contentDescription = "Pokemon image",
-        modifier = Modifier.size(80.dp)
+        modifier = Modifier.size(120.dp)
     )
 
+
+
+}
+
+@Composable
+fun RetrySection(onRetryCliked : ()-> Unit, textError : String)
+{
+    Column(horizontalAlignment = Alignment.CenterHorizontally,) {
+        Text(text = textError)
+        Button(onClick = {onRetryCliked.invoke()}) {
+            Text(text = "Retry")
+        }
+
+    }
 
 }
 
