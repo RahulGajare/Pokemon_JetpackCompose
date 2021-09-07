@@ -6,11 +6,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Absolute.Center
+
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,31 +19,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import coil.bitmap.BitmapPool
 import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
 import coil.transform.Transformation
 import com.rg.pokemon.R
 import com.rg.pokemon.models.PokemonEntry
 import com.rg.pokemon.viewmodels.PokemonListViewModel
+import java.util.*
+
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonListScreen() {
+fun PokemonListScreen(navController: NavController) {
 
     val viewModel: PokemonListViewModel = hiltViewModel()
     val pokemonEntries = viewModel.pokemonListState
@@ -80,7 +77,11 @@ fun PokemonListScreen() {
 
 
 
-            PokemonList(pokemonEntries.value, viewModel)
+            PokemonList(pokemonEntries.value, viewModel )
+            {
+                navController.navigate(route = "Pokemon_DetailScreen/${viewModel.dominantColorState.value.toArgb()}/${it}")
+
+            }
 
           
             
@@ -128,7 +129,7 @@ fun SearchBar(
 
 @ExperimentalFoundationApi
 @Composable
-fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
+fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel , onItemClick : (pokemonName : String) -> Unit)
 {
     val loadError by remember {
         viewModel.loadError
@@ -152,7 +153,7 @@ fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
                }
            }
 
-            PokemonCard(pokemon = list[item], viewModel )
+            PokemonCard(pokemon = list[item], viewModel, onItemClick)
 
        }
     }
@@ -164,7 +165,7 @@ fun PokemonList(list : List<PokemonEntry> ,viewModel: PokemonListViewModel)
 
 @ExperimentalCoilApi
 @Composable
-fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
+fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel, onItemClick: (pokemonName: String) -> Unit) {
 
     val defaultDominantColor = MaterialTheme.colors.surface
     var dominantColor by remember {
@@ -186,7 +187,8 @@ fun PokemonCard(pokemon: PokemonEntry, viewModel: PokemonListViewModel) {
                 )
             )
             .clickable {
-//                navController.navigate(route = "Pokemon_DetailScreen/${viewModel.dominantColorState.value}/${pokemon.pokemonName}")
+                onItemClick.invoke(pokemon.pokemonName.lowercase(Locale.getDefault()))
+
             })
 
     {
