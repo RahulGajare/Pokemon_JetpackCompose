@@ -149,7 +149,10 @@ fun PokemonDetailSection(pokemon: PokemonDetail) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxSize()
             .verticalScroll(scrollState)
+            .offset(y = 200.dp)
+
     )
     {
         Text(
@@ -165,8 +168,6 @@ fun PokemonDetailSection(pokemon: PokemonDetail) {
             color = MaterialTheme.colors.onSurface,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold
-
-
         )
 
         PokemonTypeSection(pokemon.types)
@@ -177,17 +178,21 @@ fun PokemonDetailSection(pokemon: PokemonDetail) {
 @Composable
 fun PokemonTypeSection(types: List<Type>) {
 
-    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+    Row(horizontalArrangement = Arrangement.SpaceEvenly,
+    modifier = Modifier.fillMaxWidth()) {
         for (type in types) {
             Box(
                 modifier = Modifier
-                    .padding(5.dp)
                     .clip(CircleShape)
-                    .background(Color.Yellow),
+                    .background(Color.Yellow)
+                    .padding(20.dp),
+
+
                 contentAlignment = Alignment.Center
             )
             {
-                Text(text = type.type.name.replaceFirstChar {
+                Text(fontSize = 18.sp ,
+                    text = type.type.name.replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase(
                         Locale.getDefault()
                     ) else it.toString()
